@@ -9,11 +9,20 @@ A small Noctalia plugin for switching between headset audio and the laptop's def
 - When headset mode is active, clicking the icon restores the default laptop audio configuration.
 - Reflect the actual audio configuration, including changes made outside the plugin.
 
-The exact Noctalia placement and integration will be confirmed during discovery. “Headset configuration” may involve output, microphone input, device profile, or a combination; the user's current setup will determine what needs to change.
+Target: Noctalia 5.4+ (locally verified: 5.4.1), using a Luau bar widget and a `plugin.toml` manifest.
+
+Both modes use the same **Built-in Audio Analog Stereo** device, with a headset connected through the audio jack:
+
+| Mode | Output port | Input port |
+| --- | --- | --- |
+| Headset | Headphones | Headset Microphone |
+| Laptop | Speakers | Internal Microphone |
+
+Headset mode is active only when both headset ports are selected. A mixed configuration counts as inactive; clicking then selects both headset ports. No device profile change is requested.
 
 ## Status
 
-Project setup and requirements captured. No plugin code yet.
+Requirements and local audio port identifiers captured. No plugin code yet. See [docs/audio-discovery.md](docs/audio-discovery.md) for the verified device names and proposed integration.
 
 See [TASKS.md](TASKS.md) for the working backlog and open questions. Keep that file updated as work progresses; record confirmed decisions there so later development has a shared reference.
 

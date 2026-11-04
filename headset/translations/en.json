@@ -1,0 +1,4 @@
+{
+  "settings.sink": "Built-in audio output device name",
+  "settings.source": "Built-in audio input device name"
+}

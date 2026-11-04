@@ -1,0 +1,25 @@
+id = "witspirit/headset"
+name = "Headset Toggle"
+version = "0.1.0"
+plugin_api = 24
+author = "witspirit"
+icon = "headset"
+description = "Switch built-in analog audio between headset and laptop ports."
+tags = ["audio", "bar", "utility"]
+dependencies = ["pactl", "timeout"]
+
+[[setting]]
+key = "sink"
+type = "string"
+label_key = "settings.sink"
+default = "alsa_output.pci-0000_00_1f.3.analog-stereo"
+
+[[setting]]
+key = "source"
+type = "string"
+label_key = "settings.source"
+default = "alsa_input.pci-0000_00_1f.3.analog-stereo"
+
+[[widget]]
+id = "toggle"
+entry = "widget.luau"

@@ -22,7 +22,9 @@ Headset mode is active only when both headset ports are selected. A mixed config
 
 ## Status
 
-Requirements and local audio port identifiers captured. No plugin code yet. See [docs/audio-discovery.md](docs/audio-discovery.md) for the verified device names and proposed integration.
+The first widget is implemented in [headset/](headset/), registered with the local Noctalia instance, and placed immediately before the volume widget. Plugin lint and 13 mock-host behavioral tests pass. Live visual and physical audio verification are pending.
+
+See [headset/README.md](headset/README.md) for installation, behavior, and verification, and [docs/audio-discovery.md](docs/audio-discovery.md) for the discovered device names.
 
 See [TASKS.md](TASKS.md) for the working backlog and open questions. Keep that file updated as work progresses; record confirmed decisions there so later development has a shared reference.
 

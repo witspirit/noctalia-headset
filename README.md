@@ -5,8 +5,9 @@ A small Noctalia plugin for switching between headset audio and the laptop's def
 ## Intended behavior
 
 - Show an icon in Noctalia's tray/bar area indicating whether headset mode is active.
-- When headset mode is inactive, clicking the icon activates the headset configuration.
+- When laptop mode is active, clicking the icon activates the headset configuration.
 - When headset mode is active, clicking the icon restores the default laptop audio configuration.
+- Any other port combination shows an unknown-state icon; clicking restores laptop mode, after which clicks alternate between headset and laptop.
 - Reflect the actual audio configuration, including changes made outside the plugin.
 
 Target: Noctalia 5.4+ (locally verified: 5.4.1), using a Luau bar widget and a `plugin.toml` manifest.
@@ -18,11 +19,11 @@ Both modes use the same **Built-in Audio Analog Stereo** device, with a headset 
 | Headset | Headphones | Headset Microphone |
 | Laptop | Speakers | Internal Microphone |
 
-Headset mode is active only when both headset ports are selected. A mixed configuration counts as inactive; clicking then selects both headset ports. No device profile change is requested.
+Each known mode requires both of its ports to match. Any other combination is unknown and has its own question-mark icon. Clicking from unknown selects laptop mode. Unknown is an observed state, never a configuration the plugin deliberately selects. No device profile change is requested.
 
 ## Status
 
-The first widget is implemented in [headset/](headset/), registered with the local Noctalia instance, and placed immediately before the volume widget. Plugin lint and 13 mock-host behavioral tests pass. Live visual and physical audio verification are pending.
+The first widget is implemented in [headset/](headset/), registered with the local Noctalia instance, and placed immediately before the volume widget. Plugin lint and 15 mock-host behavioral tests pass. Live visual and physical audio verification are pending.
 
 See [headset/README.md](headset/README.md) for installation, behavior, and verification, and [docs/audio-discovery.md](docs/audio-discovery.md) for the discovered device names.
 

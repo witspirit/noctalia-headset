@@ -3,7 +3,8 @@
 A Noctalia 5.4+ Luau bar widget for the built-in analog audio device.
 
 - **Headset icon, accent color:** Headphones and Headset Microphone are both selected. Click to select Speakers and Internal Microphone.
-- **Laptop icon:** headset mode is inactive. Click to select Headphones and Headset Microphone. The tooltip distinguishes laptop mode from a mixed configuration.
+- **Laptop icon:** Speakers and Internal Microphone are both selected. Click to select Headphones and Headset Microphone.
+- **Question-mark icon:** any other port combination is unknown. Click to select Speakers and Internal Microphone; the next click selects headset mode. The plugin never deliberately selects a mixed configuration.
 - **Warning triangle:** audio state could not be read. Hover for the error.
 - **Error color and notification:** a requested switch failed or a port is unavailable. The icon still represents the measured ports.
 
@@ -56,9 +57,9 @@ Live verification remains to be completed:
 
 1. With the headset unplugged and the laptop ports selected, confirm the laptop icon and hover text. Clicking should report an unavailable headset and leave both ports alone.
 2. Plug in the headset. Jack detection may automatically change one or both ports; the icon should catch up within about two seconds.
-3. Click from a non-headset configuration. In the audio settings, verify **Headphones** and **Headset Microphone**. Verify playback and microphone capture physically.
+3. Starting in laptop mode, click once. In the audio settings, verify **Headphones** and **Headset Microphone**. Verify playback and microphone capture physically.
 4. Click again. Verify **Speakers** and **Internal Microphone**, playback, and microphone capture.
-5. Change either port in another audio tool. Verify the icon/tooltip follows the actual state. A mixed configuration should toggle toward headset mode on the next click.
+5. Change either port in another audio tool to create a mixed configuration. Verify the question-mark icon and unknown tooltip appear. Click once to restore laptop mode, then again for headset mode.
 6. Unplug the headset. Verify the resulting configuration is reflected and a click does not claim success for unavailable ports.
 
 The mock tests also cover failed commands, missing devices/ports, invalid or truncated JSON, launch refusal, repeated clicks, and commands that succeed without the ports staying selected. Physical switching and visual rendering still require the live checks above.

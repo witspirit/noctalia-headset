@@ -24,6 +24,8 @@ At discovery, the active ports were Speakers and Internal Microphone. Both heads
 
 Use a Luau bar widget. Read `pactl --format=json list sinks` and `pactl --format=json list sources` and compare the selected devices' `active_port` fields. Do not use transient numeric device indexes or the monitor source.
 
+Classify exact output/input pairs as headset or laptop mode; every other pair is unknown and uses a question-mark icon. Clicking unknown selects laptop mode, then normal laptop/headset toggling resumes. A read failure still uses the separate warning triangle because the current ports could not be measured.
+
 Noctalia documents asynchronous subprocess execution with argument arrays and result callbacks, so the widget can invoke `pactl` directly and inspect failures without blocking the UI or constructing shell command strings. The array form requires plugin API 24; verify compatibility with the installed release when creating the manifest.
 
 On click, set both ports for the requested mode and reread the actual state. Do not claim success based on a click or the first successful command. If only one port changes, report the failure and show the measured state. Preserve volume, mute, device profiles, and default-device selection unless later requirements explicitly change them.

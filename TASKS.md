@@ -47,7 +47,7 @@ Resolve these from the local setup where possible; ask the user for preferences 
 - 2026-11-04: Track project progress locally in this file alongside the source code.
 - 2026-11-04: Target Noctalia 5.4+ with Luau; installed version verified as 5.4.1.
 - 2026-11-04: Switch ports on Built-in Audio Analog Stereo: Headphones + Headset Microphone for headset mode; Speakers + Internal Microphone for laptop mode. The headset uses the audio jack.
-- 2026-11-04: Both headset ports must match for the icon to indicate headset mode; a mixed configuration toggles toward headset mode, following the original inactive-click behavior.
+- 2026-11-04: Each known mode requires both ports to match. All other combinations show an unknown state with a question-mark icon. Clicking unknown restores laptop mode; further clicks alternate headset and laptop. This supersedes the initial behavior of toggling mixed configurations toward headset.
 - 2026-11-04: Use a Luau bar widget (API 24) invoking `pactl` through argument arrays, with five-second command timeouts and two-second polling. Keep default devices, volumes, mute state, and device profiles unchanged.
 
 ## Progress log
@@ -56,3 +56,4 @@ Resolve these from the local setup where possible; ask the user for preferences 
 - 2026-11-04: Read local PipeWire/PulseAudio device metadata and recorded exact ports in `docs/audio-discovery.md`. Current state was laptop mode; no audio settings changed.
 - 2026-11-04: Implemented `witspirit/headset:toggle`, its device-name settings, failure feedback, and measured-state verification. Noctalia lint: zero errors/warnings. All 13 mock-host tests passed under Lua 5.4 (not the Luau runtime).
 - 2026-11-04: Registered the checkout as path source `headset-dev`, enabled `witspirit/headset`, and inserted widget `headset` before Volume while preserving existing bar items. Noctalia reports the plugin enabled and the shell healthy; no matching plugin errors appeared in the recent user journal. Visual confirmation and physical switching remain pending. No audio port writes were invoked during development.
+- 2026-11-04: Added explicit unknown-state detection and a separate question-mark icon for mixed/other ports. Unknown clicks restore laptop mode, including when the headset is unavailable. Updated regression tests: all 15 pass; plugin lint has zero errors/warnings. Luau edits are covered by the existing local-source hot reload.

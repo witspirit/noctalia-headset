@@ -8,9 +8,13 @@ local snapshot = nil
 local busy = false
 local lastError = nil
 
-local function isHeadset(state)
-    return state.output.active_port == modes.headset.output
-        and state.input.active_port == modes.headset.input
+local function currentMode(state)
+    for name, ports in pairs(modes) do
+        if state.output.active_port == ports.output and state.input.active_port == ports.input then
+            return name
+        end
+    end
+    return "unknown"
 end
 
 local function paint()
@@ -21,14 +25,14 @@ local function paint()
         barWidget.setTooltip(lastError or "Reading audio configuration…")
         return
     end
-    local active = isHeadset(snapshot)
-    local laptop = snapshot.output.active_port == modes.laptop.output
-        and snapshot.input.active_port == modes.laptop.input
-    barWidget.setGlyph(active and "headset" or "device-laptop")
+    local mode = currentMode(snapshot)
+    local active = mode == "headset"
+    local glyphs = { headset = "headset", laptop = "device-laptop", unknown = "help-circle" }
+    barWidget.setGlyph(glyphs[mode])
     barWidget.setGlyphColor(lastError and "error" or (active and "primary" or "on_surface"))
-    local title = active and "Headset mode" or (laptop and "Laptop mode" or "Mixed audio configuration")
-    local action = active and "Click to use laptop speakers and microphone."
-        or "Click to use headphones and headset microphone."
+    local title = active and "Headset mode" or (mode == "laptop" and "Laptop mode" or "Unknown audio configuration")
+    local action = mode == "laptop" and "Click to use headphones and headset microphone."
+        or "Click to use laptop speakers and microphone."
     barWidget.setTooltip(title .. "\nOutput: " .. tostring(snapshot.output.active_port)
         .. "\nInput: " .. tostring(snapshot.input.active_port)
         .. "\n" .. (busy and "Switching / refreshing…" or action)
@@ -160,7 +164,8 @@ function onClick()
             paint()
             return
         end
-        local target = isHeadset(state) and modes.laptop or modes.headset
+        -- Unknown is observed only, never selected: recover to laptop, then toggle normally.
+        local target = currentMode(state) == "laptop" and modes.headset or modes.laptop
         local unavailable = portError(state.output, target.output) or portError(state.input, target.input)
         if unavailable then
             busy = false

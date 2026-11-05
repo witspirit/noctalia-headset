@@ -82,7 +82,7 @@ test("startup and external changes reflect actual ports", function()
     assert(h.glyph == "headset" and h.color == "primary")
     h.output.active_port = speaker
     h.env.update(); h.drain()
-    assert(h.glyph == "device-laptop" and h.tooltip:find("Mixed"))
+    assert(h.glyph == "help-circle" and h.tooltip:find("Unknown"))
 end)
 
 test("toggles both directions and verifies with a reread", function()
@@ -106,10 +106,34 @@ test("click preflight uses fresh state and suppresses overlapping work", functio
     assert(#h.writes == 2 and h.output.active_port == speaker)
 end)
 
-test("mixed mode goes toward headset", function()
-    local h = host(headphones, internal)
+test("all other port combinations are unknown and recover through laptop to headset", function()
+    for _, ports in ipairs({ { headphones, internal }, { speaker, headset },
+        { speaker, "analog-input-headphone-mic" }, { "other-output", "other-input" } }) do
+        local h = host(ports[1], ports[2])
+        h.env.update(); h.drain()
+        assert(h.glyph == "help-circle" and h.color == "on_surface")
+        assert(h.tooltip:find("Unknown") and h.tooltip:find("Click to use laptop"))
+        h.env.onClick(); h.drain()
+        assert(h.glyph == "device-laptop" and h.output.active_port == speaker and h.input.active_port == internal)
+        h.env.onClick(); h.drain()
+        assert(h.glyph == "headset" and #h.notifications == 0)
+    end
+end)
+
+test("unknown configuration recovers to laptop with the headset unplugged", function()
+    local h = host(headphones, internal, "not available")
     h.env.onClick(); h.drain()
-    assert(h.glyph == "headset")
+    assert(h.glyph == "device-laptop" and #h.notifications == 0)
+    h.env.onClick(); h.drain()
+    assert(h.glyph == "device-laptop" and #h.notifications == 1)
+end)
+
+test("click preflight recognizes a newly mixed configuration", function()
+    local h = host()
+    h.env.update(); h.drain()
+    h.input.active_port = headset
+    h.env.onClick(); h.drain()
+    assert(h.output.active_port == speaker and h.input.active_port == internal)
 end)
 
 test("unplugged headset is rejected before any writes", function()
@@ -131,7 +155,7 @@ test("second command failure displays measured mixed state", function()
     h.fail["set-source-port"] = true
     h.env.onClick(); h.drain()
     assert(h.output.active_port == headphones and h.input.active_port == internal)
-    assert(h.glyph == "device-laptop" and h.color == "error" and h.tooltip:find("Mixed"))
+    assert(h.glyph == "help-circle" and h.color == "error" and h.tooltip:find("Unknown"))
     assert(#h.notifications == 1)
 end)
 

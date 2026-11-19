@@ -1,12 +1,12 @@
 id = "witspirit/headset"
-name = "Headset Toggle"
-version = "0.1.0"
+name = "Audio Presets"
+version = "0.2.0"
 plugin_api = 24
 author = "witspirit"
 icon = "headset"
-description = "Switch built-in analog audio between headset and laptop ports."
+description = "Switch between laptop, headset, and HDMI stand-up audio."
 tags = ["audio", "bar", "utility"]
-dependencies = ["pactl", "timeout"]
+dependencies = ["pactl", "timeout", "sleep"]
 
 [[setting]]
 key = "sink"
@@ -20,6 +20,23 @@ type = "string"
 label_key = "settings.source"
 default = "alsa_input.pci-0000_00_1f.3.analog-stereo"
 
+[[setting]]
+key = "webcam_source"
+type = "string"
+label_key = "settings.webcam_source"
+default = "alsa_input.usb-046d_Logitech_Webcam_C925e_AB823B7F-02.analog-stereo"
+
 [[widget]]
 id = "toggle"
 entry = "widget.luau"
+
+[[panel]]
+id = "presets"
+entry = "presets.luau"
+open_near_click = true
+width = 200
+height = 144
+
+[[service]]
+id = "audio"
+entry = "audio.luau"

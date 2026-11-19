@@ -20,28 +20,9 @@ The separate input port `analog-input-headphone-mic` is labeled “Microphone”
 
 At discovery, the active ports were Speakers and Internal Microphone. Both headset ports reported `not available`; availability must be checked again with the headset connected. Only read operations were performed.
 
-## Proposed implementation
-
-Use a Luau bar widget. Read `pactl --format=json list sinks` and `pactl --format=json list sources` and compare the selected devices' `active_port` fields. Do not use transient numeric device indexes or the monitor source.
-
-Classify exact output/input pairs as headset or laptop mode; every other pair is unknown and uses a question-mark icon. Clicking unknown selects laptop mode, then normal laptop/headset toggling resumes. A read failure still uses the separate warning triangle because the current ports could not be measured.
-
-Noctalia documents asynchronous subprocess execution with argument arrays and result callbacks, so the widget can invoke `pactl` directly and inspect failures without blocking the UI or constructing shell command strings. The array form requires plugin API 24; verify compatibility with the installed release when creating the manifest.
-
-On click, set both ports for the requested mode and reread the actual state. Do not claim success based on a click or the first successful command. If only one port changes, report the failure and show the measured state. Preserve volume, mute, device profiles, and default-device selection unless later requirements explicitly change them.
-
-Refresh after outside changes, either through an audio event subscription or bounded polling. Confirm the appropriate lifecycle hooks before choosing the mechanism.
-
-## References
-
-- [Noctalia plugin development](https://docs.noctalia.dev/noctalia/plugins/development/)
-- [Noctalia runtime API: subprocesses](https://docs.noctalia.dev/noctalia/plugins/development/runtime-api/#subprocesses-and-environment)
-
-These links track rolling documentation. Check against the 5.4.1 reference when implementing.
-
 ## Standup setup discovery (2026-11-16)
 
-Observed with the TV powered on and connected through the USB-C adapter. These are identifiers for future development, not a completed standup profile. Audio playback and microphone capture were not physically verified during this discovery.
+Observed with the TV powered on and connected through the USB-C adapter. Playback and microphone capture in Teams still need a hardware test.
 
 | Item | Observed identifier / value |
 | --- | --- |
@@ -58,8 +39,6 @@ Observed with the TV powered on and connected through the USB-C adapter. These a
 | TV Niri output | `DP-2`, reported as `PNP(XXX) AAA Unknown` |
 | Laptop Niri output | `eDP-1`, reported as `Sharp Corporation 0x1515 Unknown` |
 
-The TV audio was detected as available while the analog profile was active, but the HDMI sink was not exposed until the card profile was changed. The HDMI profile was selected manually and the HDMI sink was then set as the default. At capture, the default input was the built-in analog input; the webcam input was available. The desired standup microphone has not been specified.
+The TV port showed as available in `pactl --format=json list cards` while the analog profile was active. The HDMI sink appeared after switching the card profile manually. The Stand-up preset selects this HDMI sink and the available Logitech webcam microphone as the system defaults. With the TV unplugged on 2026-11-19, the HDMI port reported `not available` and the HDMI profile reported `available: false`.
 
 The TV was at logical position `(0, -1080)`, 1920×1080 at 60 Hz, scale 1; the laptop was at `(1920, -1140)`, 1920×1200 at approximately 59.95 Hz, scale 1. These positions are an observed temporary layout, not a requested persistent layout. The TV is reached as DisplayPort (`DP-2`) on the laptop side despite the adapter's HDMI connector. Connector names and generic display identity may change with hardware/port; numeric PipeWire/PulseAudio indexes are transient. Re-check availability and actual names at activation.
-
-A future standup mode would need to switch the card profile before selecting the HDMI sink; returning to laptop/headset mode may need to restore the analog profile before selecting the existing analog ports. Re-read state and handle missing TV, input choice, partial failures, and restoration explicitly. This extends the existing design decision to preserve profiles/default devices and requires behavior and tests to be updated. Display mirroring is a separate concern: Niri's documented workaround uses `wl-mirror`, not native output cloning.

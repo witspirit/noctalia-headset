@@ -1,22 +1,16 @@
-# Headset Toggle
+# Audio Presets
 
-A Noctalia 5.4+ Luau bar widget for the built-in analog audio device.
+Click the icon beside Volume to open the preset menu. Select **Laptop** for the built-in speakers and microphone, **Headset** for the wired headphones and headset microphone, or **Stand-up** for the HDMI TV and Logitech webcam microphone. Right-click the bar icon to refresh immediately. The widget also refreshes every two seconds.
 
-- **Headset icon, accent color:** Headphones and Headset Microphone are both selected. Click to select Speakers and Internal Microphone.
-- **Laptop icon:** Speakers and Internal Microphone are both selected. Click to select Headphones and Headset Microphone.
-- **Question-mark icon:** any other port combination is unknown. Click to select Speakers and Internal Microphone; the next click selects headset mode. The plugin never deliberately selects a mixed configuration.
-- **Warning triangle:** audio state could not be read. Hover for the error.
-- **Error color and notification:** a requested switch failed or a port is unavailable. The icon still represents the measured ports.
+Unavailable presets are greyed out. Stand-up requires a connected TV on the captured HDMI port and the webcam microphone. The bar icon and the highlighted menu row reflect the measured audio configuration. A question mark indicates a different or mixed configuration. A warning icon indicates that the audio server couldn't be read.
 
-Right-click refreshes immediately. Otherwise, state refreshes every two seconds, including changes made in other audio tools. Repeated clicks during a read or switch are ignored. Reading and enabling the widget do not switch audio.
+When switching, the plugin checks the devices again before making changes. It changes the card profile as needed, waits for the playback and recording devices to appear, and selects their ports and system defaults. If a step fails, Noctalia shows an error and the widget reports the resulting audio configuration. Select an available preset to recover from a partial switch. Teams can use the selected devices when its speaker and microphone are set to the system defaults.
 
 ## Requirements
 
-- Noctalia 5.4+ (development host: 5.4.1; manifest requires plugin API 24).
-- `pactl` with JSON output and the GNU `timeout` utility on Noctalia's PATH.
-- A running PulseAudio-compatible server, including PipeWire's PulseAudio service.
-
-The plugin changes ports only. It leaves the chosen default devices, volumes, mute state, and card profile alone. Both ports are checked before switching. Unknown availability is allowed, but explicitly unavailable ports are rejected. If a port change fails partway through, the plugin reports the measured mixed state; it does not attempt an automatic rollback.
+- Noctalia 5.4+ and plugin API 24.
+- A PulseAudio-compatible server such as PipeWire's PulseAudio service.
+- `pactl` with JSON output, GNU `timeout`, and `sleep` on Noctalia's PATH.
 
 ## Local installation
 
@@ -27,13 +21,11 @@ noctalia msg plugins source add headset-dev path /home/witspirit/projects/person
 noctalia msg plugins enable witspirit/headset
 ```
 
-In Noctalia's bar settings, add **Headset Toggle** beside Volume. Enabling a plugin and placing its widget are separate steps. The widget's full type is `witspirit/headset:toggle`.
+In Noctalia's bar settings, add **Audio Presets** beside Volume. Its widget type is `witspirit/headset:toggle`. The development checkout is already registered and the widget is already placed on this machine. The plugin and widget IDs also work with existing bar configuration.
 
-This development checkout has already been registered as `headset-dev`, enabled, and placed as `headset` immediately before `volume` in `bar.default.end`. These settings are local to this machine, outside the repository. There is no need to run the installation commands again here.
+The plugin's settings gear exposes the built-in sink, built-in microphone, and stand-up webcam source names. The defaults use the [captured hardware](../docs/audio-discovery.md). Stand-up uses the built-in card associated with the configured ALSA analog sink and the `hdmi-output-0` port. Use `pactl --format=json list cards`, `list sinks`, and `list sources` to identify devices.
 
-The two device-name settings are available under the plugin's settings gear. Their defaults match the discovered devices on this laptop. Ports are intentionally fixed to the four analog ports described above. On a different machine, use `pactl --format=json list sinks` and `pactl --format=json list sources` to find its device names.
-
-Luau file edits hot-reload. After a manifest edit, run `noctalia msg config-reload`.
+Noctalia hot-reloads Luau edits. After changing the manifest, run `noctalia msg config-reload`.
 
 To disable, remove the bar widget in settings, then run:
 
@@ -51,21 +43,15 @@ noctalia plugins lint headset
 python tests/run.py
 ```
 
-The behavioral harness uses a mock Noctalia host and the system Lua 5.4 shared library. The widget deliberately uses syntax shared by Lua and Luau. These tests verify its asynchronous control flow and error handling without changing real audio; they do not substitute for verification in Noctalia's Luau runtime.
+The tests use a mock Noctalia host and the system Lua 5.4 or 5.5 shared library. They cover menu availability, external changes, profile transitions, device appearance and disconnection, and failed or partial switches.
 
-Live verification remains to be completed:
-
-1. With the headset unplugged and the laptop ports selected, confirm the laptop icon and hover text. Clicking should report an unavailable headset and leave both ports alone.
-2. Plug in the headset. Jack detection may automatically change one or both ports; the icon should catch up within about two seconds.
-3. Starting in laptop mode, click once. In the audio settings, verify **Headphones** and **Headset Microphone**. Verify playback and microphone capture physically.
-4. Click again. Verify **Speakers** and **Internal Microphone**, playback, and microphone capture.
-5. Change either port in another audio tool to create a mixed configuration. Verify the question-mark icon and unknown tooltip appear. Click once to restore laptop mode, then again for headset mode.
-6. Unplug the headset. Verify the resulting configuration is reflected and a click does not claim success for unavailable ports.
-
-The mock tests also cover failed commands, missing devices/ports, invalid or truncated JSON, launch refusal, repeated clicks, and commands that succeed without the ports staying selected. Physical switching and visual rendering still require the live checks above.
+1. With the TV and webcam unplugged, open the menu and confirm **Stand-up** is greyed out. Plug in both devices and confirm it becomes selectable.
+2. Select **Stand-up**. Check for the HDMI TV output and Logitech webcam input in the system audio settings, then test playback and microphone capture in Teams.
+3. Select **Laptop**. Check that the analog profile, speakers and internal microphone return. With the wired headset plugged in, repeat from **Stand-up** to **Headset** and check both wired ports.
+4. Unplug a device or change a default in the system audio settings. Confirm the menu and bar icon update within about two seconds.
 
 ## API references
 
 - [Noctalia 5.4.1 entry scripts](https://docs.noctalia.dev/noctalia/v5.4.1/plugins/development/entries/)
 - [Noctalia 5.4.1 runtime API](https://docs.noctalia.dev/noctalia/v5.4.1/plugins/development/runtime-api/)
-- [Noctalia 5.4.1 local development workflow](https://docs.noctalia.dev/noctalia/v5.4.1/plugins/development/workflow/)
+- [Noctalia 5.4.1 declarative UI](https://docs.noctalia.dev/noctalia/v5.4.1/plugins/development/declarative-ui/)

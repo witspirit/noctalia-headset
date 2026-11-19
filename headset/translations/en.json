@@ -1,4 +1,5 @@
 {
   "settings.sink": "Built-in audio output device name",
-  "settings.source": "Built-in audio input device name"
+  "settings.source": "Built-in audio input device name",
+  "settings.webcam_source": "Stand-up webcam microphone device name"
 }

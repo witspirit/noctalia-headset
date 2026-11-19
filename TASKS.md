@@ -1,6 +1,6 @@
 # Project tracker
 
-Last updated: 2026-11-04
+Last updated: 2026-11-19
 
 ## Milestone 0 — Project foundation
 
@@ -35,9 +35,18 @@ Implementation is checked with plugin lint and a mock-host harness; these checkb
 - [x] Register and enable the local plugin and place it beside Volume.
 - [ ] Confirm the icon and tooltip render correctly in the live bar.
 
+## Milestone 4 — Stand-up and preset menu
+
+- [x] Use the capture to add the HDMI TV and Logitech C925e preset.
+- [x] Add a bar menu with the active preset highlighted and unavailable choices disabled.
+- [x] Switch card profiles and verify the selected ports and default devices.
+- [x] Cover profile changes, hotplug, and partial failures in the mock host.
+- [x] Reload the installed plugin and verify that Noctalia opens the preset panel.
+- [ ] Verify HDMI playback and Logitech microphone capture in Teams with the hardware connected.
+
 ## Open questions
 
-- No remaining requirements questions. Headset connection is needed for physical verification of both modes.
+- Physical verification requires the wired headset, HDMI TV and Logitech webcam.
 
 Resolve these from the local setup where possible; ask the user for preferences that cannot be inferred.
 
@@ -49,6 +58,7 @@ Resolve these from the local setup where possible; ask the user for preferences 
 - 2026-11-04: Switch ports on Built-in Audio Analog Stereo: Headphones + Headset Microphone for headset mode; Speakers + Internal Microphone for laptop mode. The headset uses the audio jack.
 - 2026-11-04: Each known mode requires both ports to match. All other combinations show an unknown state with a question-mark icon. Clicking unknown restores laptop mode; further clicks alternate headset and laptop. This supersedes the initial behavior of toggling mixed configurations toward headset.
 - 2026-11-04: Use a Luau bar widget (API 24) invoking `pactl` through argument arrays, with five-second command timeouts and two-second polling. Keep default devices, volumes, mute state, and device profiles unchanged.
+- 2026-11-19: Open the preset menu on left click. Stand-up uses the HDMI output and Logitech webcam input. The presets select system defaults and switch between HDMI and analog profiles as needed.
 
 ## Progress log
 
@@ -57,3 +67,4 @@ Resolve these from the local setup where possible; ask the user for preferences 
 - 2026-11-04: Implemented `witspirit/headset:toggle`, its device-name settings, failure feedback, and measured-state verification. Noctalia lint: zero errors/warnings. All 13 mock-host tests passed under Lua 5.4 (not the Luau runtime).
 - 2026-11-04: Registered the checkout as path source `headset-dev`, enabled `witspirit/headset`, and inserted widget `headset` before Volume while preserving existing bar items. Noctalia reports the plugin enabled and the shell healthy; no matching plugin errors appeared in the recent user journal. Visual confirmation and physical switching remain pending. No audio port writes were invoked during development.
 - 2026-11-04: Added explicit unknown-state detection and a separate question-mark icon for mixed/other ports. Unknown clicks restore laptop mode, including when the headset is unavailable. Updated regression tests: all 15 pass; plugin lint has zero errors/warnings. Luau edits are covered by the existing local-source hot reload.
+- 2026-11-19: Loaded Audio Presets 0.2.0 in Noctalia 5.5.0. Plugin lint and 18 mock-host tests pass. Noctalia opened the preset panel over IPC and reported it active.
